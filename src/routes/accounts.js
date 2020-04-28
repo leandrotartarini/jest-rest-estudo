@@ -52,7 +52,7 @@ module.exports = (app) => {
 
   router.delete('/:id', async (req, res, next) => {
     try {
-      const result = await app.services.account.remove(req.params.id)
+      await app.services.account.remove(req.params.id)
       res.status(204).send();
     } catch {
       return next(err);
