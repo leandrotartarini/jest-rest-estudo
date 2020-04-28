@@ -39,10 +39,43 @@ test('Deve listar apenas as transações do usuário', async () => {
 
 test('Deve inserir uma transação com sucesso', async () => {
   const res = await request(app).post(MAIN_ROUTE).set('authorization', `bearer ${user.token}`)
-    .send({ description: 'New T', date: new Date(), ammount: 100, type: 'I', acc_id: accUser.id })
+    .send({ description: 'New T', date: new Date(), ammount: 100, type: 'I', acc_id: accUser.id });
   expect(res.status).toBe(201);
   expect(res.body.acc_id).toBe(accUser.id);
   expect(res.body.ammount).toBe('100.00');
+});
+
+test('Transações de entrada devem ser positivas', async () => {
+  const res = await request(app).post(MAIN_ROUTE).set('authorization', `bearer ${user.token}`)
+    .send({ description: 'New T', date: new Date(), ammount: -100, type: 'I', acc_id: accUser.id });
+  expect(res.status).toBe(201);
+  expect(res.body.acc_id).toBe(accUser.id);
+  expect(res.body.ammount).toBe('100.00');
+});
+
+test('Transações de saída devem ser negativas', async () => {
+  const res = await request(app).post(MAIN_ROUTE).set('authorization', `bearer ${user.token}`)
+    .send({ description: 'New T', date: new Date(), ammount: 100, type: 'O', acc_id: accUser.id });
+  expect(res.status).toBe(201);
+  expect(res.body.acc_id).toBe(accUser.id);
+  expect(res.body.ammount).toBe('-100.00');
+});
+
+describe('Ao tentar inserir uma transação inválida', () => {
+  const testTemplate = async (newData, errorMessage) => {
+    const res = await request(app).post(MAIN_ROUTE)
+      .set('authorization', `bearer ${user.token}`)
+      .send({ description: 'New T', date: new Date(), ammount: 100, type: 'I', acc_id: accUser.id, ...newData });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe(errorMessage);
+  };
+
+  test('Não deve inserir uma transação sem descrição', () => testTemplate({ description: null }, 'Descrição é um atributo obrigatório'));
+  test('Não deve inserir uma transação sem valor', () => testTemplate({ ammount: null }, 'Valor é um atributo obrigatório'));
+  test('Não deve inserir uma transação sem data', () => testTemplate({ date: null }, 'Data é um atributo obrigatório'));
+  test('Não deve inserir uma transação sem conta', () => testTemplate({ acc_id: null }, 'Conta é um atributo obrigatório'));
+  test('Não deve inserir uma transação sem tipo', () => testTemplate({ type: null }, 'Tipo é um atributo obrigatório'));
+  test('Não deve inserir uma transação com tipo inválido', () => testTemplate({ type: 'A' }, 'Tipo Inválido'));
 });
 
 test('Deve retornar uma transação por ID', async () => {
@@ -98,4 +131,13 @@ test('Não deve retornar uma transação de outro usuário', async () => {
     .set('authorization', `bearer ${user.token}`);
   expect(res.status).toBe(403);
   expect(res.body.error).toBe('Este recurso não pertence ao usuário');
+});
+
+test('Não deve remover conta com transação', async () => {
+  await app.db('transactions').insert(
+    { description: 'To delete', date: new Date(), ammount: 100, type: 'I', acc_id: accUser.id }, ['id']);
+  const res = await request(app).delete(`/v1/accounts/${accUser.id}`)
+    .set('authorization', `bearer ${user.token}`);
+  expect(res.status).toBe(400);
+  expect(res.body.error).toBe('Essa conta possui transações associadas');
 });
