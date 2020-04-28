@@ -36,3 +36,11 @@ test('Deve listar apenas as transações do usuário', async () => {
   expect(res.body).toHaveLength(1);
   expect(res.body[0].description).toBe('T1');
 });
+
+test('Deve inserir uma transação com sucesso', async () => {
+  const res = await request(app).post(MAIN_ROUTE).set('authorization', `bearer ${user.token}`)
+    .send({ description: 'New T', date: new Date(), ammount: 100, type: 'I', acc_id: accUser.id })
+  expect(res.status).toBe(201);
+  expect(res.body.acc_id).toBe(accUser.id);
+  expect(res.body.ammount).toBe('100.00');
+})
