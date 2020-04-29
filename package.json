@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "jest",
-    "secure-mode": "jest --watchAll --verbose=true"
+    "secure-mode": "jest --watchAll --verbose=false"
   },
   "keywords": [],
   "author": "",
