@@ -3,10 +3,23 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "statements": 80,
+        "branches": 80,
+        "functions": 80,
+        "lines": 80
+      },
+      "./src/services": {
+        "lines": 100
+      }
+    }
+  },
   "scripts": {
-    "start": "node src/server.js",
-    "test": "jest",
-    "secure-mode": "jest --watchAll --verbose=true"
+    "start": "NODE_ENV=prod node src/server.js",
+    "test": "NODE_ENV=test jest --coverage --runInBand --forceExit",
+    "secure-mode": "NODE_ENV=test jest --watchAll --verbose=true"
   },
   "keywords": [],
   "author": "",
@@ -29,9 +42,12 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pg": "^8.0.3",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "uuidv4": "^6.0.8",
+    "winston": "^3.2.1"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1"
   }
 }

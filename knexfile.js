@@ -7,11 +7,17 @@ module.exports = {
       password: 'docker',
       database: 'barriga',
     },
-    migrations: {
-      directory: 'src/migrations',
+    migrations: { directory: 'src/migrations' },
+    seeds: { directory: 'src/seeds' },
+  },
+  prod: {
+    client: 'pg',
+    connection: {
+      host: '127.0.0.1',
+      user: 'postgres',
+      password: 'docker',
+      database: 'seubarriga',
     },
-    seeds: {
-      directory: 'src/seeds'
-    },
+    migrations: { directory: 'src/migrations' },
   },
 };
