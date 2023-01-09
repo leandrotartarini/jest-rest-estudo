@@ -40,7 +40,7 @@
     "knex-logger": "^0.1.0",
     "moment": "^2.25.1",
     "passport": "^0.4.1",
-    "passport-jwt": "^4.0.0",
+    "passport-jwt": "^4.0.1",
     "pg": "^8.0.3",
     "supertest": "^4.0.2",
     "uuidv4": "^6.0.8",
